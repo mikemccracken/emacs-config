@@ -1,3 +1,6 @@
+(require 'cask "~/.cask/cask.el")
+(cask-initialize)
+
 (global-set-key [down-mouse-3] 'imenu)
 (global-font-lock-mode 1)
 
