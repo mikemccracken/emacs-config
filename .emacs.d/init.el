@@ -225,13 +225,11 @@ downcased, no preceding underscore.
  '(erc-current-nick-highlight-type (quote all))
  '(erc-hide-list (quote ("JOIN" "PART" "QUIT" "MODE")))
  '(erc-keyword-highlight-type (quote all))
- '(erc-keywords (quote ("darwin")))
  '(erc-lurker-hide-list (quote ("JOIN" "PART" "QUIT")))
  '(erc-match-mode t)
  '(erc-modules (quote (autojoin button completion fill irccontrols keep-place list match menu move-to-prompt netsplit networks noncommands notify readonly ring stamp highlight-nicknames)))
  '(erc-move-to-prompt-mode t)
  '(erc-nick "mmcc")
- '(erc-pals (quote ("briancurtin" "ralsina")))
  '(erc-server-send-ping-timeout 240)
  '(erc-track-minor-mode t)
  '(erc-track-mode t)
@@ -243,7 +241,6 @@ downcased, no preceding underscore.
  '(flymake-gui-warnings-enabled nil)
  '(flymake-log-level 0)
  '(font-use-system-font nil)
- '(ghc-module-command "/Users/mmccrack/Library/Haskell/ghc-7.4.1/lib/ghc-mod-1.11.0/bin/ghc-mod" t)
  '(glasses-face (quote bold))
  '(glasses-original-separator "")
  '(glasses-separate-parentheses-p nil)
@@ -290,21 +287,8 @@ downcased, no preceding underscore.
 (setenv "PATH" (concat (getenv "PATH")
 		       ":/Users/mmccrack/bin"))
 		       
-;; DTrace stuff:
 
-(autoload 'd-mode "d-mode" () t)
-(add-to-list 'auto-mode-alist '("\\.d\\'" . d-mode))
-
-(add-hook 'd-mode-hook 'imenu-add-menubar-index)
-(add-hook 'd-mode-hook 'font-lock-mode)
 (put 'narrow-to-region 'disabled nil)
-
-
-;; processing mode
-;; (add-to-list 'load-path "/path/to/processing-emacs/") ;; -it's just in ~/elisp/
-;;(autoload 'processing-mode "processing-mode" "Processing mode" t)
-;;(add-to-list 'auto-mode-alist '("\\.pde$" . processing-mode))
-;;(setq processing-location "/Users/mmccrack/Tools/processing-1.2.1/")
 
 
 ;;; FLYMAKE MODE:
