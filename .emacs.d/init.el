@@ -135,8 +135,8 @@
 ;; (require 'anything-match-plugin)
 
 ;; YASNIPPET
-(add-to-list 'load-path
-	     "~/elisp/yasnippet")
+;(add-to-list 'load-path
+;	     "~/elisp/yasnippet")
 (require 'yasnippet)
 (yas/global-mode 1)
 
