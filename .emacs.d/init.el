@@ -1,5 +1,24 @@
 ;(require 'cask "~/.cask/cask.el")
 ;(cask-initialize)
+;;;;;;(toggle-debug-on-error)
+(require 'package)
+(package-initialize)
+
+(require 'org-table)
+
+(defun cleanup-org-tables ()
+  (save-excursion
+    (goto-char (point-min))
+    (while (search-forward "-+-" nil t) (replace-match "-|-"))
+    ))
+
+(add-hook 'markdown-mode-hook 'orgtbl-mode)
+(add-hook 'markdown-mode-hook
+          (lambda()
+                        (add-hook 'after-save-hook 'cleanup-org-tables  nil 'make-it-local)))
+;; workaround virtualbox and trusty removing my cmd-space
+; overrides newline-and-indent which I don't use...
+(global-set-key "\C-j" 'set-mark-command)
 
 (global-set-key [down-mouse-3] 'imenu)
 (global-font-lock-mode 1)
@@ -49,8 +68,7 @@
 (global-set-key [f4] 'insert-time)
 (global-set-key [f5] 'tag-as-debug)
 (global-set-key [f8] 'compile)
-
-(global-set-key "\C-co" 'occur)
+(global-set-key [f9] 'magit-status)
 
 (global-set-key "\C-w" 'backward-kill-word)
 (global-set-key "\C-x\C-k" 'kill-region)
@@ -71,12 +89,13 @@
 
 ;; PYTHON
 
-;; python keys
-;; maybe these aren't so useful:
-;; (eval-after-load 'python
-;;   '(define-key python-mode-map (kbd "M-n") 'python-end-of-block))
-;; (eval-after-load 'python
-;;   '(define-key python-mode-map (kbd "M-p") 'python-beginning-of-block))
+;; (add-to-list 'load-path "~/.emacs.d/flymake-pycheckers")
+;; (require 'flymake-pycheckers)
+;; (add-to-list 'flymake-allowed-file-name-masks
+;;              '("\\.py\\'" flymake-pycheckers-init))
+;; (add-hook 'find-file-hook 'flymake-find-file-hook)
+;(add-to-list 'load-path "~/.emacs.d/")
+;;;;;;; slow???(require 'flymake-cursor)
 
 ;; Python Jedi mode
 
@@ -128,17 +147,11 @@
       (setq linum-format "%3d ")
       )
 
-;;; ANYTHING.EL
-
-;; (require 'anything-config)
-;; (global-set-key "\C-xa" 'anything)
-;; (require 'anything-match-plugin)
-
 ;; YASNIPPET
 ;(add-to-list 'load-path
 ;	     "~/elisp/yasnippet")
-(require 'yasnippet)
-(yas/global-mode 1)
+;(require 'yasnippet)
+;(yas/global-mode 1)
 
 
 ;; handy text manip stuff
@@ -162,12 +175,60 @@ downcased, no preceding underscore.
 (require 'win-switch)
 (global-set-key "\C-xo" 'win-switch-dispatch)
 
-;; winner mode for window config undo:
-(winner-mode 1)
+;; HELM
 
-;; replaces iswitchb:
-(require 'ido)
-(ido-mode)
+;; must set before helm-config,  otherwise helm use default
+;; prefix "C-x c", which is inconvenient because you can
+;; accidentially pressed "C-x C-c"
+(setq helm-command-prefix-key "C-c h")
+
+(require 'helm-config)
+(require 'helm-eshell)
+(require 'helm-files)
+(require 'helm-grep)
+
+(global-set-key "\C-co" 'helm-occur)
+(global-set-key (kbd "C-x b") 'helm-mini)
+
+
+(define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebihnd tab to do persistent action
+(define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB works in terminal
+(define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
+
+(define-key helm-grep-mode-map (kbd "<return>")  'helm-grep-mode-jump-other-window)
+(define-key helm-grep-mode-map (kbd "n")  'helm-grep-mode-jump-other-window-forward)
+(define-key helm-grep-mode-map (kbd "p")  'helm-grep-mode-jump-other-window-backward)
+
+(setq
+ helm-google-suggest-use-curl-p t
+ helm-scroll-amount 4 ; scroll 4 lines other window using M-<next>/M-<prior>
+ helm-quick-update t ; do not display invisible candidates
+ helm-idle-delay 0.01 ; be idle for this many seconds, before updating in delayed sources.
+ helm-input-idle-delay 0.01 ; be idle for this many seconds, before updating candidate buffer
+ helm-ff-search-library-in-sexp t ; search for library in `require' and `declare-function' sexp.
+
+ helm-split-window-default-side 'other ;; open helm buffer in another window
+ helm-split-window-in-side-p t ;; open helm buffer inside current window, not occupy whole other window
+ helm-buffers-favorite-modes (append helm-buffers-favorite-modes
+                                     '(picture-mode artist-mode))
+ helm-candidate-number-limit 200 ; limit the number of displayed canidates
+ helm-M-x-requires-pattern 0     ; show all candidates when set to 0
+ helm-boring-file-regexp-list
+ '("\\.git$" "\\.hg$" "\\.svn$" "\\.CVS$" "\\._darcs$" "\\.la$" "\\.o$" "\\.i$") ; do not show these files in helm buffer
+ helm-ff-file-name-history-use-recentf t
+ helm-move-to-line-cycle-in-source t ; move to end or beginning of source
+                                        ; when reaching top or bottom of source.
+ ido-use-virtual-buffers t      ; Needed in helm-buffers-list
+ helm-buffers-fuzzy-matching t          ; fuzzy matching buffer names when non--nil
+                                        ; useful in helm-mini that lists buffers
+ )
+
+;; Save current position to mark ring when jumping to a different place
+(add-hook 'helm-goto-line-before-hook 'helm-save-current-pos-to-mark-ring)
+
+(helm-mode 1)
+;;; END HELM
+
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -177,13 +238,6 @@ downcased, no preceding underscore.
  '(default ((t (:inherit nil :stipple nil :background "White" :foreground "Black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 83 :width normal :foundry "unknown" :family "Anonymous Pro"))))
  '(autoface-default ((((type ns)) (:height 90 :family "Monaco"))))
  '(echo-area ((((type ns)) (:stipple nil :strike-through nil :underline nil :slant normal :weight normal :height 90 :family "Monaco"))))
- '(erc-current-nick-face ((t (:background "yellow" :foreground "black"))))
- '(erc-direct-msg-face ((t (:foreground "dark blue"))))
- '(erc-input-face ((t (:foreground "#666666"))))
- '(erc-keyword-face ((t (:background "gray70" :foreground "black"))))
- '(erc-nick-msg-face ((t (:foreground "IndianRed" :weight bold))))
- '(erc-notice-face ((t (:foreground "gray86"))))
- '(erc-timestamp-face ((t (:foreground "gray44"))))
  '(font-lock-keyword-face ((((class color) (min-colors 8)) (:foreground "black" :weight bold))))
  '(linum ((t (:inherit (shadow default) :background "#efefef" :height 1.0))))
  '(notes-bold-face ((t (:weight bold))) t)
@@ -222,20 +276,6 @@ downcased, no preceding underscore.
  '(ecb-options-version "2.40")
  '(electric-pair-mode nil)
  '(elide-head-headers-to-hide (quote (("Canonical Ltd." . "delete it here.") ("is free software[:;] you can redistribute it" . "\\(Boston, MA 0211\\(1-1307\\|0-1301\\), USA\\|If not, see <http://www\\.gnu\\.org/licenses/>\\)\\.") ("The Regents of the University of California\\.  All rights reserved\\." . "SUCH DAMAGE\\.") ("Permission is hereby granted, free of charge" . "authorization from the X Consortium\\."))))
- '(erc-current-nick-highlight-type (quote all))
- '(erc-hide-list (quote ("JOIN" "PART" "QUIT" "MODE")))
- '(erc-keyword-highlight-type (quote all))
- '(erc-lurker-hide-list (quote ("JOIN" "PART" "QUIT")))
- '(erc-match-mode t)
- '(erc-modules (quote (autojoin button completion fill irccontrols keep-place list match menu move-to-prompt netsplit networks noncommands notify readonly ring stamp highlight-nicknames)))
- '(erc-move-to-prompt-mode t)
- '(erc-nick "mmcc")
- '(erc-server-send-ping-timeout 240)
- '(erc-track-minor-mode t)
- '(erc-track-mode t)
- '(erc-track-position-in-mode-line t)
- '(erc-track-shorten-start 4)
- '(erc-track-when-inactive t)
  '(face-font-family-alternatives (quote (("monaco" "courier" "fixed") ("helv" "helvetica" "arial" "fixed"))))
  '(flymake-allowed-file-name-masks (quote (("\\.py\\'" flymake-pycheckers-init) ("\\.xml\\'" flymake-xml-init) ("\\.html?\\'" flymake-xml-init) ("\\.cs\\'" flymake-simple-make-init) ("\\.p[ml]\\'" flymake-perl-init) ("\\.php[345]?\\'" flymake-php-init) ("\\.java\\'" flymake-simple-make-java-init flymake-simple-java-cleanup) ("[0-9]+\\.tex\\'" flymake-master-tex-init flymake-master-cleanup) ("\\.tex\\'" flymake-simple-tex-init) ("\\.idl\\'" flymake-simple-make-init))))
  '(flymake-gui-warnings-enabled nil)
@@ -283,11 +323,6 @@ downcased, no preceding underscore.
  '(window-combination-resize t)
  '(window-min-width 80))
 
-; so we pick up ack and others:
-(setenv "PATH" (concat (getenv "PATH")
-		       ":/Users/mmccrack/bin"))
-		       
-
 (put 'narrow-to-region 'disabled nil)
 
 
@@ -314,16 +349,20 @@ downcased, no preceding underscore.
 (load-library "flymake-cursor-error")
 
 
-;;     (add-to-list 'load-path "/Users/mmccrack/elisp/ack-and-a-half.el")
-     (autoload 'ack-and-a-half-same "ack-and-a-half" nil t)
-     (autoload 'ack-and-a-half "ack-and-a-half" nil t)
-     (autoload 'ack-and-a-half-find-file-same "ack-and-a-half" nil t)
-     (autoload 'ack-and-a-half-find-file "ack-and-a-half" nil t)
-     (defalias 'ack 'ack-and-a-half)
-     (defalias 'ack-same 'ack-and-a-half-same)
-     (defalias 'ack-find-file 'ack-and-a-half-find-file)
-     (defalias 'ack-find-file-same 'ack-and-a-half-find-file-same)
+(autoload 'ack-and-a-half-same "ack-and-a-half" nil t)
+(autoload 'ack-and-a-half "ack-and-a-half" nil t)
+(autoload 'ack-and-a-half-find-file-same "ack-and-a-half" nil t)
+(autoload 'ack-and-a-half-find-file "ack-and-a-half" nil t)
+(defalias 'ack 'ack-and-a-half)
+(defalias 'ack-same 'ack-and-a-half-same)
+(defalias 'ack-find-file 'ack-and-a-half-find-file)
+(defalias 'ack-find-file-same 'ack-and-a-half-find-file-same)
 
-;; ioccur
-(require 'ioccur)
 
+;; GO MODE STUFF
+
+(eval-after-load "go-mode"
+  '(require 'flymake-go))
+
+(message "CONFIG DONE")
+;;(profiler-start 'cpu)
