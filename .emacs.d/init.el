@@ -113,7 +113,7 @@
 (use-package jedi
   :ensure t
   :init
-
+  (jedi:install-server)
   (setq jedi:setup-keys t)
   (defun jedi-goto-in-other-window ()
     (interactive)
@@ -346,12 +346,7 @@ downcased, no preceding underscore.
 
 
 ;;; FLYMAKE MODE:
-
-(require 'flymake)
-
-(defvar pycheckers-cmd "/home/mmccrack/bin/pycheckers")
-
-(when (load "flymake" t)
+  (defvar pycheckers-cmd "/home/mmccrack/bin/pycheckers")
   (defun flymake-pycheckers-init ()
     (let* ((temp-file (flymake-init-create-temp-buffer-copy
                        'flymake-create-temp-inplace))
@@ -360,10 +355,12 @@ downcased, no preceding underscore.
                         (file-name-directory buffer-file-name))))
       (list pycheckers-cmd (list local-file)))
     )
-  (add-to-list 'flymake-allowed-file-name-masks 
- 	       '("\\.py\\'" flymake-pycheckers-init)))
 
-(add-hook 'find-file-hook 'flymake-find-file-hook)
+(use-package flymake
+  :config
+  (add-to-list 'flymake-allowed-file-name-masks 
+               '("\\.py\\'" flymake-pycheckers-init))
+  (add-hook 'find-file-hook 'flymake-find-file-hook))
 
 (use-package flymake-cursor
   :ensure t)
