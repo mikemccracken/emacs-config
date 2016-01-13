@@ -1,8 +1,20 @@
-;(require 'cask "~/.cask/cask.el")
-;(cask-initialize)
-;;;;;;(toggle-debug-on-error)
+;(toggle-debug-on-error)
 (require 'package)
 (package-initialize)
+(unless (assoc-default "melpa" package-archives)
+  (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
+  )
+; was in config:'(package-archives (quote (("marmalade" . "http://marmalade-repo.org/packages/") ("gnu" . "http://elpa.gnu.org/packages/") ("org" . "http://orgmode.org/elpa/"))))
+
+(unless (package-installed-p 'use-package)
+  (package-refresh-contents)
+  (package-install 'use-package))
+(setq use-package-verbose t)
+(require 'use-package)
+(use-package auto-compile
+	     :ensure t
+	     :config (auto-compile-on-load-mode))
+(setq load-prefer-newer t)
 
 (require 'org-table)
 
@@ -84,7 +96,7 @@
 (global-set-key "\C-ck" 'kill-whole-line)
 (global-set-key "\C-c\C-k" 'kill-whole-line)
 
-(setq load-path (cons "~/elisp/" load-path))
+
 
 
 ;; PYTHON
@@ -98,27 +110,25 @@
 ;;;;;;; slow???(require 'flymake-cursor)
 
 ;; Python Jedi mode
+(use-package jedi
+  :ensure t
+  :init
+
+  (setq jedi:setup-keys t)
+  (defun jedi-goto-in-other-window ()
+    (interactive)
+    (jedi:goto-definition t))
+  (add-hook 'python-mode-hook 'jedi:setup)
+  
+  ;; ;; or just autocompletion:
+  ;; ; (add-hook 'python-mode-hook 'jedi:ac-setup)
 
 
+:bind (("C->" . jedi-goto-in-other-window))
+)
 
-
-;; NOTE: make sure you set setup-keys before (el-get 'sync) below:
-(setq jedi:setup-keys t)
-(defun jedi-goto-in-other-window ()
-  (interactive)
-  (jedi:goto-definition t))
-
-(global-set-key (kbd "C->") 'jedi-goto-in-other-window)
-
-
-(add-hook 'python-mode-hook 'jedi:setup)
-;; ;; or just autocompletion:
-;; ; (add-hook 'python-mode-hook 'jedi:ac-setup)
-
-
-
-;; POS-TIP tooltip stuff, after el-get
-(require 'pos-tip)
+(use-package pos-tip
+  :ensure t)
 
 ;;; flyspell in latex
 (add-hook 'LaTeX-mode-hook 'flyspell-mode)
@@ -148,8 +158,6 @@
       )
 
 ;; YASNIPPET
-;(add-to-list 'load-path
-;	     "~/elisp/yasnippet")
 ;(require 'yasnippet)
 ;(yas/global-mode 1)
 
@@ -172,61 +180,73 @@ downcased, no preceding underscore.
 
 
 ;; WIN SWITCH FOR THE WIN SWITCHING
-(require 'win-switch)
-(global-set-key "\C-xo" 'win-switch-dispatch)
+(use-package win-switch
+  :ensure t
+  :bind (("C-x o" . win-switch-dispatch))
+  )
 
 ;; HELM
+(use-package helm
+	     :ensure t
+	     :diminish helm-mode
+	     :init
+	     ;; must set before helm-config,  otherwise helm use default
+	     ;; prefix "C-x c", which is inconvenient because you can
+	     ;; accidentially pressed "C-x C-c"
+	     (setq helm-command-prefix-key "C-c h")
+	     (require 'helm-config)
+	     (require 'helm-eshell)
+	     (require 'helm-files)
+	     (require 'helm-grep)
+	     (setq
+	      helm-google-suggest-use-curl-p t
+	      helm-scroll-amount 4 ; scroll 4 lines other window using M-<next>/M-<prior>
+	      helm-quick-update t ; do not display invisible candidates
+	      helm-idle-delay 0.01 ; be idle for this many seconds, before updating in delayed sources.
+	      helm-input-idle-delay 0.01 ; be idle for this many seconds, before updating candidate buffer
+	      helm-ff-search-library-in-sexp t ; search for library in `require' and `declare-function' sexp.
 
-;; must set before helm-config,  otherwise helm use default
-;; prefix "C-x c", which is inconvenient because you can
-;; accidentially pressed "C-x C-c"
-(setq helm-command-prefix-key "C-c h")
-
-(require 'helm-config)
-(require 'helm-eshell)
-(require 'helm-files)
-(require 'helm-grep)
-
-(global-set-key "\C-co" 'helm-occur)
-(global-set-key (kbd "C-x b") 'helm-mini)
-
-
-(define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebihnd tab to do persistent action
-(define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB works in terminal
-(define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
-
-(define-key helm-grep-mode-map (kbd "<return>")  'helm-grep-mode-jump-other-window)
-(define-key helm-grep-mode-map (kbd "n")  'helm-grep-mode-jump-other-window-forward)
-(define-key helm-grep-mode-map (kbd "p")  'helm-grep-mode-jump-other-window-backward)
-
-(setq
- helm-google-suggest-use-curl-p t
- helm-scroll-amount 4 ; scroll 4 lines other window using M-<next>/M-<prior>
- helm-quick-update t ; do not display invisible candidates
- helm-idle-delay 0.01 ; be idle for this many seconds, before updating in delayed sources.
- helm-input-idle-delay 0.01 ; be idle for this many seconds, before updating candidate buffer
- helm-ff-search-library-in-sexp t ; search for library in `require' and `declare-function' sexp.
-
- helm-split-window-default-side 'other ;; open helm buffer in another window
- helm-split-window-in-side-p t ;; open helm buffer inside current window, not occupy whole other window
- helm-buffers-favorite-modes (append helm-buffers-favorite-modes
-                                     '(picture-mode artist-mode))
- helm-candidate-number-limit 200 ; limit the number of displayed canidates
- helm-M-x-requires-pattern 0     ; show all candidates when set to 0
- helm-boring-file-regexp-list
- '("\\.git$" "\\.hg$" "\\.svn$" "\\.CVS$" "\\._darcs$" "\\.la$" "\\.o$" "\\.i$") ; do not show these files in helm buffer
- helm-ff-file-name-history-use-recentf t
- helm-move-to-line-cycle-in-source t ; move to end or beginning of source
+	      helm-split-window-default-side 'other ;; open helm buffer in another window
+	      helm-split-window-in-side-p t ;; open helm buffer inside current window, not occupy whole other window
+	      helm-buffers-favorite-modes (append helm-buffers-favorite-modes
+						  '(picture-mode artist-mode))
+	      helm-candidate-number-limit 200 ; limit the number of displayed canidates
+	      helm-M-x-requires-pattern 0     ; show all candidates when set to 0
+	      helm-boring-file-regexp-list
+	      '("\\.git$" "\\.hg$" "\\.svn$" "\\.CVS$" "\\._darcs$" "\\.la$" "\\.o$" "\\.i$") ; do not show these files in helm buffer
+	      helm-ff-file-name-history-use-recentf t
+	      helm-move-to-line-cycle-in-source t ; move to end or beginning of source
                                         ; when reaching top or bottom of source.
- ido-use-virtual-buffers t      ; Needed in helm-buffers-list
- helm-buffers-fuzzy-matching t          ; fuzzy matching buffer names when non--nil
+	      ido-use-virtual-buffers t      ; Needed in helm-buffers-list
+	      helm-buffers-fuzzy-matching t          ; fuzzy matching buffer names when non--nil
                                         ; useful in helm-mini that lists buffers
- )
+	      )
+	     (define-key helm-map (kbd "<tab>") 'helm-execute-persistent-action) ; rebihnd tab to do persistent action
+	     (define-key helm-map (kbd "C-i") 'helm-execute-persistent-action) ; make TAB works in terminal
+	     (define-key helm-map (kbd "C-z")  'helm-select-action) ; list actions using C-z
+	     
+	     (define-key helm-grep-mode-map (kbd "<return>")  'helm-grep-mode-jump-other-window)
+	     (define-key helm-grep-mode-map (kbd "n")  'helm-grep-mode-jump-other-window-forward)
+	     (define-key helm-grep-mode-map (kbd "p")  'helm-grep-mode-jump-other-window-backward)
+	     
+	     (helm-mode)
+
+	     :bind (("C-c o" . helm-occur)
+		    ("C-x b" . helm-mini)
+                    ("C-x C-f" . helm-find-files))
+	     )
+
+(use-package helm-descbinds
+	     :defer t
+	     :ensure t
+	     :bind (("C-h b" . helm-descbinds)
+		             ("C-h w" . helm-descbinds)))
+
 
 ;; Save current position to mark ring when jumping to a different place
 (add-hook 'helm-goto-line-before-hook 'helm-save-current-pos-to-mark-ring)
 
-(helm-mode 1)
+
 ;;; END HELM
 
 
@@ -296,7 +316,6 @@ downcased, no preceding underscore.
  '(ns-command-modifier (quote meta))
  '(nyan-bar-length 16)
  '(nyan-mode t)
- '(package-archives (quote (("marmalade" . "http://marmalade-repo.org/packages/") ("gnu" . "http://elpa.gnu.org/packages/") ("org" . "http://orgmode.org/elpa/"))))
  '(pastebin-default-subdomain "paste.ubuntu.com")
  '(python-python-command "/usr/bin/python")
  '(safe-local-variable-values (quote ((test-case-name . twisted\.names\.test) (test-case-name . twisted\.names\.test\.test_names) (encoding . utf-8))))
@@ -346,7 +365,8 @@ downcased, no preceding underscore.
 
 (add-hook 'find-file-hook 'flymake-find-file-hook)
 
-(load-library "flymake-cursor-error")
+(use-package flymake-cursor
+  :ensure t)
 
 
 (autoload 'ack-and-a-half-same "ack-and-a-half" nil t)
