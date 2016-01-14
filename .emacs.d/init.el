@@ -19,6 +19,9 @@
 	     :config (auto-compile-on-load-mode))
 (setq load-prefer-newer t)
 
+(use-package ace-jump-mode
+  :bind ("C-c ." . ace-jump-mode))
+
 (require 'org-table)
 
 (defun cleanup-org-tables ()
