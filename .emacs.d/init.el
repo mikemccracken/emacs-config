@@ -278,15 +278,42 @@ downcased, no preceding underscore.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(ac-auto-show-menu 0.4)
- '(ack-and-a-half-arguments (quote ("--follow")))
+ '(ack-and-a-half-arguments (quote ("--nopager")))
  '(ack-and-a-half-executable "ack")
  '(ack-and-a-half-prompt-for-directory t)
  '(browse-url-browser-function (quote browse-url-default-macosx-browser))
- '(c-default-style (quote ((objc-mode . "cc-mode") (java-mode . "java") (awk-mode . "awk") (other . "cc-mode"))))
- '(c-mode-common-hook (quote ((lambda nil (dolist (k (quote (":" ">" ";" "<" "{" "}"))) (define-key (symbol-value (make-local-variable (quote yas-keymap))) k (quote self-insert-command)))) elide-head)))
- '(c-offsets-alist (quote ((defun-open . --) (inline-open . 0) (substatement-open . 0) (innamespace . [0]))))
+ '(c-default-style
+   (quote
+    ((objc-mode . "cc-mode")
+     (java-mode . "java")
+     (awk-mode . "awk")
+     (other . "cc-mode"))))
+ '(c-mode-common-hook
+   (quote
+    ((lambda nil
+       (dolist
+           (k
+            (quote
+             (":" ">" ";" "<" "{" "}")))
+         (define-key
+           (symbol-value
+            (make-local-variable
+             (quote yas-keymap)))
+           k
+           (quote self-insert-command))))
+     elide-head)))
+ '(c-offsets-alist
+   (quote
+    ((defun-open . --)
+     (inline-open . 0)
+     (substatement-open . 0)
+     (innamespace .
+                  [0]))))
  '(column-number-mode t)
- '(compilation-error-regexp-alist (quote (("Loc: \\[\\(.*.qml\\)(\\([0-9]+\\))" 1 2) absoft ada aix ant bash borland python-tracebacks-and-caml comma cucumber msft edg-1 edg-2 epc ftnchek iar ibm irix java jikes-file maven jikes-line gcc-include ruby-Test::Unit gnu lcc makepp mips-1 mips-2 msft omake oracle perl php rxp sparc-pascal-file sparc-pascal-line sparc-pascal-example sun sun-ada watcom 4bsd gcov-file gcov-header gcov-nomark gcov-called-line gcov-never-called perl--Pod::Checker perl--Test perl--Test2 perl--Test::Harness weblint)))
+ '(compilation-error-regexp-alist
+   (quote
+    (("Loc: \\[\\(.*.qml\\)(\\([0-9]+\\))" 1 2)
+     absoft ada aix ant bash borland python-tracebacks-and-caml comma cucumber msft edg-1 edg-2 epc ftnchek iar ibm irix java jikes-file maven jikes-line gcc-include ruby-Test::Unit gnu lcc makepp mips-1 mips-2 msft omake oracle perl php rxp sparc-pascal-file sparc-pascal-line sparc-pascal-example sun sun-ada watcom 4bsd gcov-file gcov-header gcov-nomark gcov-called-line gcov-never-called perl--Pod::Checker perl--Test perl--Test2 perl--Test::Harness weblint)))
  '(compilation-read-command nil)
  '(compilation-scroll-output (quote first-error))
  '(compilation-skip-visited t)
@@ -298,9 +325,28 @@ downcased, no preceding underscore.
  '(display-time-mode t)
  '(ecb-options-version "2.40")
  '(electric-pair-mode nil)
- '(elide-head-headers-to-hide (quote (("Canonical Ltd." . "delete it here.") ("is free software[:;] you can redistribute it" . "\\(Boston, MA 0211\\(1-1307\\|0-1301\\), USA\\|If not, see <http://www\\.gnu\\.org/licenses/>\\)\\.") ("The Regents of the University of California\\.  All rights reserved\\." . "SUCH DAMAGE\\.") ("Permission is hereby granted, free of charge" . "authorization from the X Consortium\\."))))
- '(face-font-family-alternatives (quote (("monaco" "courier" "fixed") ("helv" "helvetica" "arial" "fixed"))))
- '(flymake-allowed-file-name-masks (quote (("\\.py\\'" flymake-pycheckers-init) ("\\.xml\\'" flymake-xml-init) ("\\.html?\\'" flymake-xml-init) ("\\.cs\\'" flymake-simple-make-init) ("\\.p[ml]\\'" flymake-perl-init) ("\\.php[345]?\\'" flymake-php-init) ("\\.java\\'" flymake-simple-make-java-init flymake-simple-java-cleanup) ("[0-9]+\\.tex\\'" flymake-master-tex-init flymake-master-cleanup) ("\\.tex\\'" flymake-simple-tex-init) ("\\.idl\\'" flymake-simple-make-init))))
+ '(elide-head-headers-to-hide
+   (quote
+    (("Canonical Ltd." . "delete it here.")
+     ("is free software[:;] you can redistribute it" . "\\(Boston, MA 0211\\(1-1307\\|0-1301\\), USA\\|If not, see <http://www\\.gnu\\.org/licenses/>\\)\\.")
+     ("The Regents of the University of California\\.  All rights reserved\\." . "SUCH DAMAGE\\.")
+     ("Permission is hereby granted, free of charge" . "authorization from the X Consortium\\."))))
+ '(face-font-family-alternatives
+   (quote
+    (("monaco" "courier" "fixed")
+     ("helv" "helvetica" "arial" "fixed"))))
+ '(flymake-allowed-file-name-masks
+   (quote
+    (("\\.py\\'" flymake-pycheckers-init)
+     ("\\.xml\\'" flymake-xml-init)
+     ("\\.html?\\'" flymake-xml-init)
+     ("\\.cs\\'" flymake-simple-make-init)
+     ("\\.p[ml]\\'" flymake-perl-init)
+     ("\\.php[345]?\\'" flymake-php-init)
+     ("\\.java\\'" flymake-simple-make-java-init flymake-simple-java-cleanup)
+     ("[0-9]+\\.tex\\'" flymake-master-tex-init flymake-master-cleanup)
+     ("\\.tex\\'" flymake-simple-tex-init)
+     ("\\.idl\\'" flymake-simple-make-init))))
  '(flymake-gui-warnings-enabled nil)
  '(flymake-log-level 0)
  '(font-use-system-font nil)
@@ -321,13 +367,25 @@ downcased, no preceding underscore.
  '(nyan-mode t)
  '(pastebin-default-subdomain "paste.ubuntu.com")
  '(python-python-command "/usr/bin/python")
- '(safe-local-variable-values (quote ((test-case-name . twisted\.names\.test) (test-case-name . twisted\.names\.test\.test_names) (encoding . utf-8))))
+ '(safe-local-variable-values
+   (quote
+    ((test-case-name . twisted\.names\.test)
+     (test-case-name . twisted\.names\.test\.test_names)
+     (encoding . utf-8))))
  '(scalable-fonts-allowed t)
  '(scroll-bar-mode (quote right))
  '(send-mail-function (quote mailclient-send-it))
  '(show-paren-mode t)
  '(speedbar-directory-button-trim-method (quote trim))
- '(speedbar-frame-parameters (quote ((minibuffer) (width . 40) (border-width . 0) (menu-bar-lines . 0) (tool-bar-lines . 0) (unsplittable . t) (left-fringe . 0))))
+ '(speedbar-frame-parameters
+   (quote
+    ((minibuffer)
+     (width . 40)
+     (border-width . 0)
+     (menu-bar-lines . 0)
+     (tool-bar-lines . 0)
+     (unsplittable . t)
+     (left-fringe . 0))))
  '(speedbar-track-mouse-flag t)
  '(speedbar-use-images nil)
  '(split-height-threshold 100)
@@ -338,7 +396,9 @@ downcased, no preceding underscore.
  '(vc-bzr-program "/usr/bin/bzr")
  '(vc-hg-program "/usr/local/bin/hg")
  '(whitespace-global-modes (quote (python)))
- '(whitespace-style (quote (face tabs trailing space-before-tab empty space-after-tab)))
+ '(whitespace-style
+   (quote
+    (face tabs trailing space-before-tab empty space-after-tab)))
  '(win-switch-feedback-foreground-color "grey")
  '(win-switch-other-window-first nil)
  '(win-switch-window-threshold 0)
