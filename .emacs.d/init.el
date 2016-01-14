@@ -83,7 +83,6 @@
 (global-set-key [f4] 'insert-time)
 (global-set-key [f5] 'tag-as-debug)
 (global-set-key [f8] 'compile)
-(global-set-key [f9] 'magit-status)
 
 (global-set-key "\C-w" 'backward-kill-word)
 (global-set-key "\C-x\C-k" 'kill-region)
@@ -100,6 +99,11 @@
 (global-set-key "\C-c\C-k" 'kill-whole-line)
 
 
+(use-package magit
+  :ensure t
+  :bind (("<f9>" . magit-status))
+  :pin melpa
+  )
 
 
 ;; PYTHON
