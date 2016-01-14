@@ -4,6 +4,9 @@
 (unless (assoc-default "melpa" package-archives)
   (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
   )
+(unless (assoc-default "marmalade" package-archives)
+  (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/") t)
+  )
 ; was in config:'(package-archives (quote (("marmalade" . "http://marmalade-repo.org/packages/") ("gnu" . "http://elpa.gnu.org/packages/") ("org" . "http://orgmode.org/elpa/"))))
 
 (unless (package-installed-p 'use-package)
@@ -366,15 +369,19 @@ downcased, no preceding underscore.
   :ensure t)
 
 
-(autoload 'ack-and-a-half-same "ack-and-a-half" nil t)
-(autoload 'ack-and-a-half "ack-and-a-half" nil t)
-(autoload 'ack-and-a-half-find-file-same "ack-and-a-half" nil t)
-(autoload 'ack-and-a-half-find-file "ack-and-a-half" nil t)
-(defalias 'ack 'ack-and-a-half)
-(defalias 'ack-same 'ack-and-a-half-same)
-(defalias 'ack-find-file 'ack-and-a-half-find-file)
-(defalias 'ack-find-file-same 'ack-and-a-half-find-file-same)
-
+(use-package ack-and-a-half
+  :ensure t
+  :init
+  (autoload 'ack-and-a-half-same "ack-and-a-half" nil t)
+  (autoload 'ack-and-a-half "ack-and-a-half" nil t)
+  (autoload 'ack-and-a-half-find-file-same "ack-and-a-half" nil t)
+  (autoload 'ack-and-a-half-find-file "ack-and-a-half" nil t)
+  :config
+  (defalias 'ack 'ack-and-a-half)
+  (defalias 'ack-same 'ack-and-a-half-same)
+  (defalias 'ack-find-file 'ack-and-a-half-find-file)
+  (defalias 'ack-find-file-same 'ack-and-a-half-find-file-same)
+  )
 
 ;; GO MODE STUFF
 
