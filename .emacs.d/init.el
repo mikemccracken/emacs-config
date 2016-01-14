@@ -20,7 +20,7 @@
 (setq load-prefer-newer t)
 
 (use-package ace-jump-mode
-  :bind ("C-c ." . ace-jump-mode))
+  :bind ("C-c SPC" . ace-jump-mode))
 
 (require 'org-table)
 
