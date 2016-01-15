@@ -108,7 +108,9 @@
   :pin melpa
   )
 
-
+(use-package yaml-mode
+  :ensure t
+  )
 ;; PYTHON
 
 ;; (add-to-list 'load-path "~/.emacs.d/flymake-pycheckers")
