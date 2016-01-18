@@ -22,6 +22,9 @@
 (use-package ace-jump-mode
   :bind ("C-c SPC" . ace-jump-mode))
 
+(use-package go-mode
+  :ensure t)
+
 (require 'org-table)
 
 (defun cleanup-org-tables ()
@@ -254,6 +257,9 @@ downcased, no preceding underscore.
 	     :bind (("C-h b" . helm-descbinds)
 		             ("C-h w" . helm-descbinds)))
 
+(use-package helm-pydoc
+  :ensure t
+  )
 
 ;; Save current position to mark ring when jumping to a different place
 (add-hook 'helm-goto-line-before-hook 'helm-save-current-pos-to-mark-ring)
