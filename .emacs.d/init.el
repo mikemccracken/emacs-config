@@ -19,8 +19,15 @@
 	     :config (auto-compile-on-load-mode))
 (setq load-prefer-newer t)
 
+; Nice navigation helpers
+
 (use-package ace-jump-mode
   :bind ("C-c SPC" . ace-jump-mode))
+
+(use-package goto-chg
+  :ensure t
+  :bind (("C-c ," . goto-last-change)
+         ("C-c ." . goto-last-change-reverse)))
 
 (use-package go-mode
   :ensure t)
@@ -462,6 +469,7 @@ downcased, no preceding underscore.
 
 (eval-after-load "go-mode"
   '(require 'flymake-go))
-
+(use-package flymake-go
+  :ensure t)
 (message "CONFIG DONE")
 ;;(profiler-start 'cpu)
