@@ -467,9 +467,9 @@ downcased, no preceding underscore.
 
 ;; GO MODE STUFF
 
-(eval-after-load "go-mode"
-  '(require 'flymake-go))
-(use-package flymake-go
-  :ensure t)
+;; (eval-after-load "go-mode"
+;;   '(require 'flymake-go))
+;; (use-package flymake-go
+;;   :ensure t)
 (message "CONFIG DONE")
 ;;(profiler-start 'cpu)
