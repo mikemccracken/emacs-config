@@ -2,11 +2,11 @@
 (require 'package)
 (package-initialize)
 (unless (assoc-default "melpa" package-archives)
-  (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
   )
-(unless (assoc-default "marmalade" package-archives)
-  (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/") t)
-  )
+;; (unless (assoc-default "marmalade" package-archives)
+;;   (add-to-list 'package-archives '("marmalade" . "https://marmalade-repo.org/packages/") t)
+;;   )
 ; was in config:'(package-archives (quote (("marmalade" . "http://marmalade-repo.org/packages/") ("gnu" . "http://elpa.gnu.org/packages/") ("org" . "http://orgmode.org/elpa/"))))
 
 (unless (package-installed-p 'use-package)
@@ -19,9 +19,22 @@
 	     :config (auto-compile-on-load-mode))
 (setq load-prefer-newer t)
 
+                                        ; ansi color for tmp/q
+(require 'ansi-color)
+(defun display-ansi-colors ()
+  (interactive)
+  (let ((inhibit-read-only t))
+    (ansi-color-apply-on-region (point-min) (point-max))))
+(add-to-list 'auto-mode-alist '("/tmp/q" . display-ansi-colors))
+
+(use-package apropospriate-theme
+  :ensure t
+  :config 
+  (load-theme 'apropospriate-light t))
 ; Nice navigation helpers
 
 (use-package ace-jump-mode
+  :ensure t
   :bind ("C-c SPC" . ace-jump-mode))
 
 (use-package goto-chg
@@ -31,6 +44,20 @@
 
 (use-package go-mode
   :ensure t)
+
+(setq gofmt-command "goimports")
+;(require 'go-mode-load)
+(add-hook 'before-save-hook 'gofmt-before-save)
+
+(use-package org
+             :ensure t
+             :bind (("C-c a" . org-agenda)
+                    ("C-c c" . org-capture)
+                    ("C-c l" . org-capture-goto-last-stored))             
+             :init
+             (setq org-default-notes-file (concat org-directory "/notes.org"))
+             
+             )
 
 (require 'org-table)
 
@@ -97,6 +124,9 @@
 (global-set-key [f5] 'tag-as-debug)
 (global-set-key [f8] 'compile)
 
+(add-to-list 'compilation-finish-functions
+             'ding)
+
 (global-set-key "\C-w" 'backward-kill-word)
 (global-set-key "\C-x\C-k" 'kill-region)
 
@@ -132,22 +162,22 @@
 ;;;;;;; slow???(require 'flymake-cursor)
 
 ;; Python Jedi mode
-(use-package jedi
-  :ensure t
-  :init
-  (jedi:install-server)
-  (setq jedi:setup-keys t)
-  (defun jedi-goto-in-other-window ()
-    (interactive)
-    (jedi:goto-definition t))
-  (add-hook 'python-mode-hook 'jedi:setup)
+;; (use-package jedi
+;;   :ensure t
+;;   :init
+;;   (jedi:install-server)
+;;   (setq jedi:setup-keys t)
+;;   (defun jedi-goto-in-other-window ()
+;;     (interactive)
+;;     (jedi:goto-definition t))
+;;   (add-hook 'python-mode-hook 'jedi:setup)
   
-  ;; ;; or just autocompletion:
-  ;; ; (add-hook 'python-mode-hook 'jedi:ac-setup)
+;;   ;; ;; or just autocompletion:
+;;   ;; ; (add-hook 'python-mode-hook 'jedi:ac-setup)
 
 
-:bind (("C->" . jedi-goto-in-other-window))
-)
+;; :bind (("C->" . jedi-goto-in-other-window))
+;; )
 
 (use-package pos-tip
   :ensure t)
@@ -200,26 +230,28 @@ downcased, no preceding underscore.
                       (1+ (car bounds)) (cdr bounds))
       (downcase-region (car bounds) (cdr bounds)))))
 
-
+(message "about to win-switch")
 ;; WIN SWITCH FOR THE WIN SWITCHING
 (use-package win-switch
   :ensure t
   :bind (("C-x o" . win-switch-dispatch))
   )
-
+(message "about to helm")
+;; (use-package helm-files
+;;   :ensure t)
 ;; HELM
 (use-package helm
-	     :ensure t
+;  :ensure t
 	     :diminish helm-mode
 	     :init
 	     ;; must set before helm-config,  otherwise helm use default
 	     ;; prefix "C-x c", which is inconvenient because you can
 	     ;; accidentially pressed "C-x C-c"
 	     (setq helm-command-prefix-key "C-c h")
-	     (require 'helm-config)
-	     (require 'helm-eshell)
-	     (require 'helm-files)
-	     (require 'helm-grep)
+	      (require 'helm-config)
+	      (require 'helm-eshell)
+	      (require 'helm-files)
+	      (require 'helm-grep)
 	     (setq
 	      helm-google-suggest-use-curl-p t
 	      helm-scroll-amount 4 ; scroll 4 lines other window using M-<next>/M-<prior>
@@ -258,40 +290,43 @@ downcased, no preceding underscore.
                     ("C-x C-f" . helm-find-files))
 	     )
 
-(use-package helm-descbinds
-	     :defer t
-	     :ensure t
-	     :bind (("C-h b" . helm-descbinds)
-		             ("C-h w" . helm-descbinds)))
+;; (use-package helm-descbinds
+;; 	     :defer t
+;; 	     :ensure t
+;; 	     :bind (("C-h b" . helm-descbinds)
+;; 		             ("C-h w" . helm-descbinds)))
 
-(use-package helm-pydoc
+;; (use-package helm-pydoc
+;;   :ensure t
+;;   )
+(message "about to helmswoop")
+(use-package helm-swoop
   :ensure t
-  )
-
+  :bind (("C-c s" . helm-swoop)))
 ;; Save current position to mark ring when jumping to a different place
 (add-hook 'helm-goto-line-before-hook 'helm-save-current-pos-to-mark-ring)
 
-
+(message "done helm")
 ;;; END HELM
 
 
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "White" :foreground "Black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 83 :width normal :foundry "unknown" :family "Anonymous Pro"))))
- '(autoface-default ((((type ns)) (:height 90 :family "Monaco"))))
- '(echo-area ((((type ns)) (:stipple nil :strike-through nil :underline nil :slant normal :weight normal :height 90 :family "Monaco"))))
- '(font-lock-keyword-face ((((class color) (min-colors 8)) (:foreground "black" :weight bold))))
- '(linum ((t (:inherit (shadow default) :background "#efefef" :height 1.0))))
- '(notes-bold-face ((t (:weight bold))) t)
- '(notes-mode-default ((t (:inherit indented-text-mode-default :height 90 :family "Monaco"))) t)
- '(popup-tip-face ((t (:background "khaki1" :foreground "black" :box (:line-width 3 :color "grey75" :style released-button)))))
- '(python-mode-default ((t (:inherit autoface-default :height 90 :family "Monaco"))) t)
- '(term-mode-default ((t (:inherit autoface-default :height 90 :family "Monaco"))) t)
- '(text-mode-default ((((type ns)) (:inherit autoface-default :stipple nil :strike-through nil :underline nil :slant normal :weight normal :height 90 :width normal :family "Monaco"))))
- '(whitespace-space ((t (:foreground "gray90")))))
+;; (custom-set-faces
+;;  ;; custom-set-faces was added by Custom.
+;;  ;; If you edit it by hand, you could mess it up, so be careful.
+;;  ;; Your init file should contain only one such instance.
+;;  ;; If there is more than one, they won't work right.
+;;  '(default ((t (:inherit nil :stipple nil :background "White" :foreground "Black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 83 :width normal :foundry "unknown" :family "Anonymous Pro"))))
+;;  '(autoface-default ((((type ns)) (:height 90 :family "Monaco"))))
+;;  '(echo-area ((((type ns)) (:stipple nil :strike-through nil :underline nil :slant normal :weight normal :height 90 :family "Monaco"))))
+;;  '(font-lock-keyword-face ((((class color) (min-colors 8)) (:foreground "black" :weight bold))))
+;;  '(linum ((t (:inherit (shadow default) :background "#efefef" :height 1.0))))
+;;  '(notes-bold-face ((t (:weight bold))) t)
+;;  '(notes-mode-default ((t (:inherit indented-text-mode-default :height 90 :family "Monaco"))) t)
+;;  '(popup-tip-face ((t (:background "khaki1" :foreground "black" :box (:line-width 3 :color "grey75" :style released-button)))))
+;;  '(python-mode-default ((t (:inherit autoface-default :height 90 :family "Monaco"))) t)
+;;  '(term-mode-default ((t (:inherit autoface-default :height 90 :family "Monaco"))) t)
+;;  '(text-mode-default ((((type ns)) (:inherit autoface-default :stipple nil :strike-through nil :underline nil :slant normal :weight normal :height 90 :width normal :family "Monaco"))))
+;;  '(whitespace-space ((t (:foreground "gray90")))))
 
 
 (custom-set-variables
@@ -300,9 +335,9 @@ downcased, no preceding underscore.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(ac-auto-show-menu 0.4)
- '(ack-and-a-half-arguments (quote ("--nopager")))
+ '(ack-and-a-half-arguments (quote ("--nopager" "--ignore-file match:/.*_test.go/")))
  '(ack-and-a-half-executable "ack")
- '(ack-and-a-half-prompt-for-directory t)
+ '(beacon-color "#F8BBD0")
  '(browse-url-browser-function (quote browse-url-default-macosx-browser))
  '(c-default-style
    (quote
@@ -340,6 +375,10 @@ downcased, no preceding underscore.
  '(compilation-scroll-output (quote first-error))
  '(compilation-skip-visited t)
  '(compilation-window-height nil)
+ '(custom-enabled-themes (quote (sanityinc-solarized-dark)))
+ '(custom-safe-themes
+   (quote
+    ("5a0eee1070a4fc64268f008a4c7abfda32d912118e080e18c3c865ef864d1bea" "70f5a47eb08fe7a4ccb88e2550d377ce085fedce81cf30c56e3077f95a2909f2" "c3e6b52caa77cb09c049d3c973798bc64b5c43cc437d449eacf35b3e776bf85c" "4aee8551b53a43a883cb0b7f3255d6859d766b6c5e14bcb01bed572fcbef4328" "4cf3221feff536e2b3385209e9b9dc4c2e0818a69a1cdb4b522756bcdf4e00a4" default)))
  '(desktop-restore-eager 7)
  '(desktop-save-mode t)
  '(diary-file "~/Dropbox/jen-mike-shared/hadleydiary.txt")
@@ -376,10 +415,15 @@ downcased, no preceding underscore.
  '(glasses-original-separator "")
  '(glasses-separate-parentheses-p nil)
  '(glasses-separator "")
- '(global-auto-complete-mode t)
  '(global-linum-mode t)
  '(global-whitespace-mode t)
  '(haskell-stylish-on-save t)
+ '(highlight-indent-guides-auto-enabled nil)
+ '(highlight-symbol-colors
+   (quote
+    ("#F57F17" "#66BB6A" "#0097A7" "#42A5F5" "#7E57C2" "#D84315")))
+ '(highlight-symbol-foreground-color "#546E7A")
+ '(highlight-tail-colors (quote (("#F8BBD0" . 0) ("#FAFAFA" . 100))))
  '(indent-tabs-mode nil)
  '(ispell-highlight-face (quote flyspell-incorrect))
  '(ispell-program-name "/usr/bin/aspell")
@@ -387,8 +431,24 @@ downcased, no preceding underscore.
  '(ns-command-modifier (quote meta))
  '(nyan-bar-length 16)
  '(nyan-mode t)
+ '(org-capture-templates
+   (quote
+    (("n" "Note" entry
+      (file "~/org/notes.org")
+      "** %? 
+  %l 
+#+BEGIN_EXAMPLE
+  %i
+#+END_EXAMPLE"))))
+ '(package-selected-packages
+   (quote
+    (apropospriate-theme color-theme-sanityinc-solarized yaml-mode win-switch use-package pos-tip magit jedi helm-swoop helm-pydoc helm-descbinds goto-chg go-mode flymake-cursor auto-compile ack-and-a-half ace-jump-mode)))
  '(pastebin-default-subdomain "paste.ubuntu.com")
+ '(pos-tip-background-color "#ffffffffffff")
+ '(pos-tip-foreground-color "#78909C")
  '(python-python-command "/usr/bin/python")
+ '(remember-annotation-functions (quote (buffer-file-name)))
+ '(remember-filter-functions nil)
  '(safe-local-variable-values
    (quote
     ((test-case-name . twisted\.names\.test)
@@ -412,6 +472,7 @@ downcased, no preceding underscore.
  '(speedbar-use-images nil)
  '(split-height-threshold 100)
  '(split-width-threshold 100)
+ '(tabbar-background-color "#ffffffffffff")
  '(timeclock-modeline-display t nil (timeclock))
  '(tool-bar-mode nil)
  '(uniquify-buffer-name-style (quote forward) nil (uniquify))
@@ -467,9 +528,15 @@ downcased, no preceding underscore.
 
 ;; GO MODE STUFF
 
-(eval-after-load "go-mode"
-  '(require 'flymake-go))
-(use-package flymake-go
-  :ensure t)
+;; (eval-after-load "go-mode"
+;;   '(require 'flymake-go))
+;; (use-package flymake-go
+;;   :ensure t)
 (message "CONFIG DONE")
 ;;(profiler-start 'cpu)
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
