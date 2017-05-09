@@ -290,19 +290,12 @@ downcased, no preceding underscore.
                     ("C-x C-f" . helm-find-files))
 	     )
 
-;; (use-package helm-descbinds
-;; 	     :defer t
-;; 	     :ensure t
-;; 	     :bind (("C-h b" . helm-descbinds)
-;; 		             ("C-h w" . helm-descbinds)))
 
-;; (use-package helm-pydoc
-;;   :ensure t
-;;   )
-(message "about to helmswoop")
 (use-package helm-swoop
   :ensure t
   :bind (("C-c s" . helm-swoop)))
+
+
 ;; Save current position to mark ring when jumping to a different place
 (add-hook 'helm-goto-line-before-hook 'helm-save-current-pos-to-mark-ring)
 
