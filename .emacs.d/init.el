@@ -2,7 +2,7 @@
 (require 'package)
 (package-initialize)
 (unless (assoc-default "melpa" package-archives)
-  (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/") t)
+  (add-to-list 'package-archives '("melpa" . "https://melpa.org/packages/") t)
   )
 (unless (assoc-default "marmalade" package-archives)
   (add-to-list 'package-archives '("marmalade" . "http://marmalade-repo.org/packages/") t)
@@ -117,6 +117,12 @@
   :bind (("<f9>" . magit-status))
   :pin melpa
   )
+
+;; (use-package magit-gh-pulls
+;;   :ensure t
+;;   :init
+;;   (add-hook 'magit-mode-hook 'turn-on-magit-gh-pulls)
+;;   )
 
 (use-package yaml-mode
   :ensure t
@@ -271,27 +277,34 @@ downcased, no preceding underscore.
 ;; Save current position to mark ring when jumping to a different place
 (add-hook 'helm-goto-line-before-hook 'helm-save-current-pos-to-mark-ring)
 
+(use-package helm-ag
+  :ensure t)
+;;  :bind (("" . helm-ag-)))
 
+;; (setq helm-grep-default-command
+;;       "ack-grep -Hn --color --smart-case --no-group %e %p %f"
+;;       helm-grep-default-recurse-command
+;;             "ack-grep -H --color --smart-case --no-group %e %p %f")
 ;;; END HELM
 
 
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "White" :foreground "Black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 83 :width normal :foundry "unknown" :family "Anonymous Pro"))))
- '(autoface-default ((((type ns)) (:height 90 :family "Monaco"))))
- '(echo-area ((((type ns)) (:stipple nil :strike-through nil :underline nil :slant normal :weight normal :height 90 :family "Monaco"))))
- '(font-lock-keyword-face ((((class color) (min-colors 8)) (:foreground "black" :weight bold))))
- '(linum ((t (:inherit (shadow default) :background "#efefef" :height 1.0))))
- '(notes-bold-face ((t (:weight bold))) t)
- '(notes-mode-default ((t (:inherit indented-text-mode-default :height 90 :family "Monaco"))) t)
- '(popup-tip-face ((t (:background "khaki1" :foreground "black" :box (:line-width 3 :color "grey75" :style released-button)))))
- '(python-mode-default ((t (:inherit autoface-default :height 90 :family "Monaco"))) t)
- '(term-mode-default ((t (:inherit autoface-default :height 90 :family "Monaco"))) t)
- '(text-mode-default ((((type ns)) (:inherit autoface-default :stipple nil :strike-through nil :underline nil :slant normal :weight normal :height 90 :width normal :family "Monaco"))))
- '(whitespace-space ((t (:foreground "gray90")))))
+;; (custom-set-faces
+;;  ;; custom-set-faces was added by Custom.
+;;  ;; If you edit it by hand, you could mess it up, so be careful.
+;;  ;; Your init file should contain only one such instance.
+;;  ;; If there is more than one, they won't work right.
+;;  '(default ((t (:inherit nil :stipple nil :background "White" :foreground "Black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 83 :width normal :foundry "unknown" :family "Anonymous Pro"))))
+;;  '(autoface-default ((((type ns)) (:height 90 :family "Monaco"))))
+;;  '(echo-area ((((type ns)) (:stipple nil :strike-through nil :underline nil :slant normal :weight normal :height 90 :family "Monaco"))))
+;;  '(font-lock-keyword-face ((((class color) (min-colors 8)) (:foreground "black" :weight bold))))
+;;  '(linum ((t (:inherit (shadow default) :background "#efefef" :height 1.0))))
+;;  '(notes-bold-face ((t (:weight bold))) t)
+;;  '(notes-mode-default ((t (:inherit indented-text-mode-default :height 90 :family "Monaco"))) t)
+;;  '(popup-tip-face ((t (:background "khaki1" :foreground "black" :box (:line-width 3 :color "grey75" :style released-button)))))
+;;  '(python-mode-default ((t (:inherit autoface-default :height 90 :family "Monaco"))) t)
+;;  '(term-mode-default ((t (:inherit autoface-default :height 90 :family "Monaco"))) t)
+;;  '(text-mode-default ((((type ns)) (:inherit autoface-default :stipple nil :strike-through nil :underline nil :slant normal :weight normal :height 90 :width normal :family "Monaco"))))
+;;  '(whitespace-space ((t (:foreground "gray90")))))
 
 
 (custom-set-variables
@@ -376,10 +389,15 @@ downcased, no preceding underscore.
  '(glasses-original-separator "")
  '(glasses-separate-parentheses-p nil)
  '(glasses-separator "")
- '(global-auto-complete-mode t)
  '(global-linum-mode t)
  '(global-whitespace-mode t)
+ '(go-guru-command "/home/ubuntu/go/bin/guru")
+ '(godef-command "~/go/bin/godef")
  '(haskell-stylish-on-save t)
+ '(indent-guide-char "᠁")
+ '(indent-guide-global-mode t)
+ '(indent-guide-recursive t)
+ '(indent-guide-threshold 1)
  '(indent-tabs-mode nil)
  '(ispell-highlight-face (quote flyspell-incorrect))
  '(ispell-program-name "/usr/bin/aspell")
@@ -387,6 +405,10 @@ downcased, no preceding underscore.
  '(ns-command-modifier (quote meta))
  '(nyan-bar-length 16)
  '(nyan-mode t)
+ '(package-archives
+   (quote
+    (("marmalade" . "http://marmalade-repo.org/packages/")
+     ("melpa" . "https://melpa.org/packages/"))))
  '(pastebin-default-subdomain "paste.ubuntu.com")
  '(python-python-command "/usr/bin/python")
  '(safe-local-variable-values
@@ -425,13 +447,15 @@ downcased, no preceding underscore.
  '(win-switch-other-window-first nil)
  '(win-switch-window-threshold 0)
  '(window-combination-resize t)
- '(window-min-width 80))
+ '(window-min-width 80)
+ '(ws-butler-global-mode t)
+ '(ws-butler-keep-whitespace-before-point nil))
 
 (put 'narrow-to-region 'disabled nil)
 
 
 ;;; FLYMAKE MODE:
-  (defvar pycheckers-cmd "/home/mmccrack/bin/pycheckers")
+  (defvar pycheckers-cmd "/home/ubuntu/bin/pycheckers")
   (defun flymake-pycheckers-init ()
     (let* ((temp-file (flymake-init-create-temp-buffer-copy
                        'flymake-create-temp-inplace))
@@ -471,5 +495,6 @@ downcased, no preceding underscore.
 ;;   '(require 'flymake-go))
 ;; (use-package flymake-go
 ;;   :ensure t)
+(add-hook 'go-mode-hook #'go-guru-hl-identifier-mode)
 (message "CONFIG DONE")
 ;;(profiler-start 'cpu)
