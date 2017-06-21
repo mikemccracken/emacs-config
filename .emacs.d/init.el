@@ -31,7 +31,20 @@
 
 (use-package go-mode
   :ensure t)
+(add-hook 'before-save-hook #'gofmt-before-save)
 
+(use-package go-guru
+  :ensure t)
+
+(use-package org
+             :ensure t
+             :bind (("C-c a" . org-agenda)
+                    ("C-c c" . org-capture)
+                    ("C-c l" . org-capture-goto-last-stored))
+             :init
+             (setq org-default-notes-file "~/notes.org")
+
+             )
 (require 'org-table)
 
 (defun cleanup-org-tables ()
@@ -275,23 +288,6 @@ downcased, no preceding underscore.
 ;;; END HELM
 
 
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(default ((t (:inherit nil :stipple nil :background "White" :foreground "Black" :inverse-video nil :box nil :strike-through nil :overline nil :underline nil :slant normal :weight normal :height 83 :width normal :foundry "unknown" :family "Anonymous Pro"))))
- '(autoface-default ((((type ns)) (:height 90 :family "Monaco"))))
- '(echo-area ((((type ns)) (:stipple nil :strike-through nil :underline nil :slant normal :weight normal :height 90 :family "Monaco"))))
- '(font-lock-keyword-face ((((class color) (min-colors 8)) (:foreground "black" :weight bold))))
- '(linum ((t (:inherit (shadow default) :background "#efefef" :height 1.0))))
- '(notes-bold-face ((t (:weight bold))) t)
- '(notes-mode-default ((t (:inherit indented-text-mode-default :height 90 :family "Monaco"))) t)
- '(popup-tip-face ((t (:background "khaki1" :foreground "black" :box (:line-width 3 :color "grey75" :style released-button)))))
- '(python-mode-default ((t (:inherit autoface-default :height 90 :family "Monaco"))) t)
- '(term-mode-default ((t (:inherit autoface-default :height 90 :family "Monaco"))) t)
- '(text-mode-default ((((type ns)) (:inherit autoface-default :stipple nil :strike-through nil :underline nil :slant normal :weight normal :height 90 :width normal :family "Monaco"))))
- '(whitespace-space ((t (:foreground "gray90")))))
 
 
 (custom-set-variables
@@ -300,7 +296,7 @@ downcased, no preceding underscore.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(ac-auto-show-menu 0.4)
- '(ack-and-a-half-arguments (quote ("--nopager")))
+ '(ack-and-a-half-arguments (quote ("--nopager" "--ignore-file match:/.*_test.go/")))
  '(ack-and-a-half-executable "ack")
  '(ack-and-a-half-prompt-for-directory t)
  '(browse-url-browser-function (quote browse-url-default-macosx-browser))
@@ -384,9 +380,24 @@ downcased, no preceding underscore.
  '(ispell-highlight-face (quote flyspell-incorrect))
  '(ispell-program-name "/usr/bin/aspell")
  '(jedi:tooltip-method (quote (pos-tip)))
+ '(mode-line-format
+   (quote
+    ("%e" mode-line-front-space mode-line-mule-info mode-line-client mode-line-modified mode-line-remote mode-line-frame-identification mode-line-buffer-identification " " mode-line-position mode-line-misc-info mode-line-end-spaces)))
  '(ns-command-modifier (quote meta))
  '(nyan-bar-length 16)
  '(nyan-mode t)
+ '(org-capture-templates
+   (quote
+    (("n" "Note" entry
+      (file "~/org/notes.org")
+      "** %?
+  %l
+#+BEGIN_EXAMPLE
+  %i
+#+END_EXAMPLE"))))
+ '(package-selected-packages
+   (quote
+    (go-guru ack-and-a-half yaml-mode win-switch use-package pos-tip magit jedi helm-swoop helm-descbinds goto-chg go-mode flymake-cursor auto-compile)))
  '(pastebin-default-subdomain "paste.ubuntu.com")
  '(python-python-command "/usr/bin/python")
  '(safe-local-variable-values
@@ -466,10 +477,21 @@ downcased, no preceding underscore.
   )
 
 ;; GO MODE STUFF
-
 ;; (eval-after-load "go-mode"
 ;;   '(require 'flymake-go))
 ;; (use-package flymake-go
 ;;   :ensure t)
 (message "CONFIG DONE")
 ;;(profiler-start 'cpu)
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
+
+(setq frame-title-format
+      '(buffer-file-name "%b - %f" ; File buffer
+        (dired-directory dired-directory ; Dired buffer
+         (revert-buffer-function "%b" ; Buffer Menu
+          ("%b - Dir: " default-directory))))) ; Plain buffer
