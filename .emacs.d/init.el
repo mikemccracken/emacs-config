@@ -45,7 +45,7 @@
 (use-package go-mode
   :ensure t)
 
-(setq gofmt-command "goimports")
+;(setq gofmt-command "goimports")
 ;(require 'go-mode-load)
 (add-hook 'before-save-hook 'gofmt-before-save)
 
@@ -55,7 +55,7 @@
                     ("C-c c" . org-capture)
                     ("C-c l" . org-capture-goto-last-stored))             
              :init
-             (setq org-default-notes-file (concat org-directory "/notes.org"))
+             (setq org-default-notes-file (concat "$HOME/notes.org"))
              
              )
 
@@ -124,8 +124,10 @@
 (global-set-key [f5] 'tag-as-debug)
 (global-set-key [f8] 'compile)
 
+(defun ding-with-args ()
+  (ding))
 (add-to-list 'compilation-finish-functions
-             'ding)
+             'ding-with-args)
 
 (global-set-key "\C-w" 'backward-kill-word)
 (global-set-key "\C-x\C-k" 'kill-region)
@@ -146,6 +148,8 @@
   :ensure t
   :bind (("<f9>" . magit-status))
   :pin melpa
+  :config
+   (add-hook 'after-save-hook 'magit-after-save-refresh-status)
   )
 
 (use-package yaml-mode
@@ -158,7 +162,8 @@
 ;; (add-to-list 'flymake-allowed-file-name-masks
 ;;              '("\\.py\\'" flymake-pycheckers-init))
 ;; (add-hook 'find-file-hook 'flymake-find-file-hook)
-;(add-to-list 'load-path "~/.emacs.d/")
+
+(add-to-list 'load-path "~/.emacs.d/")
 ;;;;;;; slow???(require 'flymake-cursor)
 
 ;; Python Jedi mode
@@ -206,8 +211,7 @@
 ;;; linum for line numbers (not in emacs 22)
 (when (>= emacs-major-version 24) 
       (global-linum-mode 1)
-      (setq linum-format "%3d ")
-      )
+      (setq linum-format "%4d "))
 
 ;; YASNIPPET
 ;(require 'yasnippet)
@@ -260,8 +264,8 @@ downcased, no preceding underscore.
 	      helm-input-idle-delay 0.01 ; be idle for this many seconds, before updating candidate buffer
 	      helm-ff-search-library-in-sexp t ; search for library in `require' and `declare-function' sexp.
 
-	      helm-split-window-default-side 'other ;; open helm buffer in another window
-	      helm-split-window-in-side-p t ;; open helm buffer inside current window, not occupy whole other window
+	      helm-split-window-default-side 'right ;; open helm buffer in another window
+	      helm-split-window-in-side-p nil ;; open helm buffer inside current window, not occupy whole other window
 	      helm-buffers-favorite-modes (append helm-buffers-favorite-modes
 						  '(picture-mode artist-mode))
 	      helm-candidate-number-limit 200 ; limit the number of displayed canidates
@@ -282,12 +286,13 @@ downcased, no preceding underscore.
 	     (define-key helm-grep-mode-map (kbd "<return>")  'helm-grep-mode-jump-other-window)
 	     (define-key helm-grep-mode-map (kbd "n")  'helm-grep-mode-jump-other-window-forward)
 	     (define-key helm-grep-mode-map (kbd "p")  'helm-grep-mode-jump-other-window-backward)
-	     
+	     ;;(helm-define-key-with-subkeys global-map (kbd "C-c n") ?n 'helm-run-cycle-resume)
 	     (helm-mode)
 
 	     :bind (("C-c o" . helm-occur)
 		    ("C-x b" . helm-mini)
-                    ("C-x C-f" . helm-find-files))
+                    ("C-x C-f" . helm-find-files)
+                    )
 	     )
 
 
@@ -295,6 +300,13 @@ downcased, no preceding underscore.
   :ensure t
   :bind (("C-c s" . helm-swoop)))
 
+(use-package projectile
+  :config
+  (setq projectile-completion-system 'helm)
+  :ensure t)
+(use-package helm-projectile
+  :ensure t
+  :bind (("C-c p s a" . helm-projectile-ack)))
 
 ;; Save current position to mark ring when jumping to a different place
 (add-hook 'helm-goto-line-before-hook 'helm-save-current-pos-to-mark-ring)
@@ -330,6 +342,8 @@ downcased, no preceding underscore.
  '(ac-auto-show-menu 0.4)
  '(ack-and-a-half-arguments (quote ("--nopager" "--ignore-file match:/.*_test.go/")))
  '(ack-and-a-half-executable "ack")
+ '(ansi-color-names-vector
+   ["#FAFAFA" "#FF1744" "#66BB6A" "#F57F17" "#42A5F5" "#7E57C2" "#0097A7" "#546E7A"])
  '(beacon-color "#F8BBD0")
  '(browse-url-browser-function (quote browse-url-default-macosx-browser))
  '(c-default-style
@@ -371,7 +385,7 @@ downcased, no preceding underscore.
  '(custom-enabled-themes (quote (sanityinc-solarized-dark)))
  '(custom-safe-themes
    (quote
-    ("5a0eee1070a4fc64268f008a4c7abfda32d912118e080e18c3c865ef864d1bea" "70f5a47eb08fe7a4ccb88e2550d377ce085fedce81cf30c56e3077f95a2909f2" "c3e6b52caa77cb09c049d3c973798bc64b5c43cc437d449eacf35b3e776bf85c" "4aee8551b53a43a883cb0b7f3255d6859d766b6c5e14bcb01bed572fcbef4328" "4cf3221feff536e2b3385209e9b9dc4c2e0818a69a1cdb4b522756bcdf4e00a4" default)))
+    ("e8332c7f8afb1138a2cbf62a3625c792755f2a3a707c55cbe63afe6f9bd73119" "be5b03913a1aaa3709d731e1fcfd4f162db6ca512df9196c8d4693538fa50b86" "39a854967792547c704cbff8ad4f97429f77dfcf7b3b4d2a62679ecd34b608da" "780c67d3b58b524aa485a146ad9e837051918b722fd32fd1b7e50ec36d413e70" "f831c1716ebc909abe3c851569a402782b01074e665a4c140e3e52214f7504a0" "9b59e147dbbde5e638ea1cde5ec0a358d5f269d27bd2b893a0947c4a867e14c1" "3cd28471e80be3bd2657ca3f03fbb2884ab669662271794360866ab60b6cb6e6" "c48551a5fb7b9fc019bf3f61ebf14cf7c9cdca79bcb2a4219195371c02268f11" "3d5ef3d7ed58c9ad321f05360ad8a6b24585b9c49abcee67bdcbb0fe583a6950" "987b709680284a5858d5fe7e4e428463a20dfabe0a6f2a6146b3b8c7c529f08b" "44c566df0e1dfddc60621711155b1be4665dd3520b290cb354f8270ca57f8788" "3c83b3676d796422704082049fc38b6966bcad960f896669dfc21a7a37a748fa" "c74e83f8aa4c78a121b52146eadb792c9facc5b1f02c917e3dbb454fca931223" "a27c00821ccfd5a78b01e4f35dc056706dd9ede09a8b90c6955ae6a390eb1c1e" "5a0eee1070a4fc64268f008a4c7abfda32d912118e080e18c3c865ef864d1bea" "70f5a47eb08fe7a4ccb88e2550d377ce085fedce81cf30c56e3077f95a2909f2" "c3e6b52caa77cb09c049d3c973798bc64b5c43cc437d449eacf35b3e776bf85c" "4aee8551b53a43a883cb0b7f3255d6859d766b6c5e14bcb01bed572fcbef4328" "4cf3221feff536e2b3385209e9b9dc4c2e0818a69a1cdb4b522756bcdf4e00a4" default)))
  '(desktop-restore-eager 7)
  '(desktop-save-mode t)
  '(diary-file "~/Dropbox/jen-mike-shared/hadleydiary.txt")
@@ -385,6 +399,10 @@ downcased, no preceding underscore.
      ("is free software[:;] you can redistribute it" . "\\(Boston, MA 0211\\(1-1307\\|0-1301\\), USA\\|If not, see <http://www\\.gnu\\.org/licenses/>\\)\\.")
      ("The Regents of the University of California\\.  All rights reserved\\." . "SUCH DAMAGE\\.")
      ("Permission is hereby granted, free of charge" . "authorization from the X Consortium\\."))))
+ '(evil-emacs-state-cursor (quote ("#D50000" hbar)))
+ '(evil-insert-state-cursor (quote ("#D50000" bar)))
+ '(evil-normal-state-cursor (quote ("#F57F17" box)))
+ '(evil-visual-state-cursor (quote ("#66BB6A" box)))
  '(face-font-family-alternatives
    (quote
     (("monaco" "courier" "fixed")
@@ -410,7 +428,9 @@ downcased, no preceding underscore.
  '(glasses-separator "")
  '(global-linum-mode t)
  '(global-whitespace-mode t)
+ '(gofmt-command "gofmt")
  '(haskell-stylish-on-save t)
+ '(helm-grep-file-path-style (quote relative))
  '(highlight-indent-guides-auto-enabled nil)
  '(highlight-symbol-colors
    (quote
@@ -421,6 +441,13 @@ downcased, no preceding underscore.
  '(ispell-highlight-face (quote flyspell-incorrect))
  '(ispell-program-name "/usr/bin/aspell")
  '(jedi:tooltip-method (quote (pos-tip)))
+ '(magit-commit-arguments (quote ("--signoff")))
+ '(magit-log-arguments (quote ("--graph" "--color" "--decorate" "-n256")))
+ '(mode-line-format
+   (quote
+    ("%e" mode-line-front-space mode-line-mule-info mode-line-client mode-line-modified mode-line-remote mode-line-frame-identification mode-line-buffer-identification sml/pos-id-separator mode-line-position
+     (vc-mode vc-mode)
+     sml/pre-modes-separator mode-line-modes mode-line-misc-info mode-line-end-spaces)))
  '(ns-command-modifier (quote meta))
  '(nyan-bar-length 16)
  '(nyan-mode t)
@@ -435,22 +462,30 @@ downcased, no preceding underscore.
 #+END_EXAMPLE"))))
  '(package-selected-packages
    (quote
-    (apropospriate-theme color-theme-sanityinc-solarized yaml-mode win-switch use-package pos-tip magit jedi helm-swoop helm-pydoc helm-descbinds goto-chg go-mode flymake-cursor auto-compile ack-and-a-half ace-jump-mode)))
+    (color-theme-modern sublime-themes github-modern-theme keychain-environment smart-mode-line projectile-speedbar go-guru helm-ack helm-projectile projectile apropospriate-theme color-theme-sanityinc-solarized yaml-mode win-switch use-package pos-tip magit jedi helm-swoop helm-pydoc helm-descbinds goto-chg go-mode flymake-cursor auto-compile ack-and-a-half ace-jump-mode)))
  '(pastebin-default-subdomain "paste.ubuntu.com")
  '(pos-tip-background-color "#ffffffffffff")
  '(pos-tip-foreground-color "#78909C")
+ '(projectile-mode t nil (projectile))
+ '(projectile-mode-line nil)
  '(python-python-command "/usr/bin/python")
  '(remember-annotation-functions (quote (buffer-file-name)))
  '(remember-filter-functions nil)
  '(safe-local-variable-values
    (quote
-    ((test-case-name . twisted\.names\.test)
+    ((eval when buffer-file-name
+           (setq-local view-no-disable-on-exit t)
+           (view-mode-enter))
+     (test-case-name . twisted\.names\.test)
      (test-case-name . twisted\.names\.test\.test_names)
      (encoding . utf-8))))
  '(scalable-fonts-allowed t)
  '(scroll-bar-mode (quote right))
  '(send-mail-function (quote mailclient-send-it))
  '(show-paren-mode t)
+ '(sml/modified-char "*")
+ '(sml/no-confirm-load-theme t)
+ '(sml/theme (quote light))
  '(speedbar-directory-button-trim-method (quote trim))
  '(speedbar-frame-parameters
    (quote
@@ -461,16 +496,20 @@ downcased, no preceding underscore.
      (tool-bar-lines . 0)
      (unsplittable . t)
      (left-fringe . 0))))
+ '(speedbar-supported-extension-expressions
+   (quote
+    (".go" ".org" ".[ch]\\(\\+\\+\\|pp\\|c\\|h\\|xx\\)?" ".tex\\(i\\(nfo\\)?\\)?" ".el" ".emacs" ".l" ".lsp" ".p" ".java" ".js" ".f\\(90\\|77\\|or\\)?" ".ad[abs]" ".p[lm]" ".tcl" ".m" ".scm" ".pm" ".py" ".g" ".s?html" ".ma?k" "[Mm]akefile\\(\\.in\\)?")))
  '(speedbar-track-mouse-flag t)
  '(speedbar-use-images nil)
  '(split-height-threshold 100)
  '(split-width-threshold 100)
  '(tabbar-background-color "#ffffffffffff")
- '(timeclock-modeline-display t nil (timeclock))
+ '(timeclock-mode-line-display t nil (timeclock))
  '(tool-bar-mode nil)
  '(uniquify-buffer-name-style (quote forward) nil (uniquify))
  '(vc-bzr-program "/usr/bin/bzr")
  '(vc-hg-program "/usr/local/bin/hg")
+ '(which-function-mode t)
  '(whitespace-global-modes (quote (python)))
  '(whitespace-style
    (quote
@@ -525,7 +564,7 @@ downcased, no preceding underscore.
 ;;   '(require 'flymake-go))
 ;; (use-package flymake-go
 ;;   :ensure t)
-(message "CONFIG DONE")
+
 ;;(profiler-start 'cpu)
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -533,3 +572,48 @@ downcased, no preceding underscore.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
+
+(defun rotate-windows (arg)
+  "Rotate your windows; use the prefix argument to rotate the other direction"
+  (interactive "P")
+  (if (not (> (count-windows) 1))
+      (message "You can't rotate a single window!")
+    (let* ((rotate-times (prefix-numeric-value arg))
+           (direction (if (or (< rotate-times 0) (equal arg '(4)))
+                          'reverse 'identity)))
+      (dotimes (_ (abs rotate-times))
+        (dotimes (i (- (count-windows) 1))
+          (let* ((w1 (elt (funcall direction (window-list)) i))
+                 (w2 (elt (funcall direction (window-list)) (+ i 1)))
+                 (b1 (window-buffer w1))
+                 (b2 (window-buffer w2))
+                 (s1 (window-start w1))
+                 (s2 (window-start w2))
+                 (p1 (window-point w1))
+                 (p2 (window-point w2)))
+            (set-window-buffer-start-and-point w1 b2 s2 p2)
+            (set-window-buffer-start-and-point w2 b1 s1 p1)))))))
+
+
+
+(defun jao-toggle-selective-display (column)
+  (interactive "P")
+  (set-selective-display 
+   (if selective-display nil (or column 1))))
+(global-set-key [f1] 'jao-toggle-selective-display)
+
+(use-package smart-mode-line
+  :ensure t
+  :init
+  (sml/setup))
+
+(use-package keychain-environment
+  :ensure t
+  :init
+  (keychain-refresh-environment)
+  )
+
+(require 'mike-theme-theme)
+
+(message "CONFIG DONE")
+
